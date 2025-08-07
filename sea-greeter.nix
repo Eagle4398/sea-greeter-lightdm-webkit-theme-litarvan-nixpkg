@@ -10,6 +10,7 @@
 , glib
 , libyaml
 , typescript
+, makeWrapper
 , theme ? null
 , backgrounds ? null
 , enableHWAcceleration ? false
@@ -27,7 +28,7 @@ stdenv.mkDerivation rec {
     fetchSubmodules = true;
   };
 
-  nativeBuildInputs = [ meson ninja pkg-config typescript ];
+  nativeBuildInputs = [ meson ninja pkg-config typescript makeWrapper];
 
   buildInputs = [ gtk3 webkitgtk lightdm glib libyaml theme ];
 
@@ -75,13 +76,12 @@ stdenv.mkDerivation rec {
     mv $NESTED_DIR/* $out/
     rm -rf $out/nix
 
+    ${lib.optionalString (enableHWAcceleration == false) ''
+        wrapProgram $out/bin/sea-greeter --set WEBKIT_DISABLE_DMABUF_RENDERER 1
+    ''}
+
     substituteInPlace $out/usr/share/xgreeters/sea-greeter.desktop \
-      --replace "Exec=sea-greeter" "Exec=${
-        if enableHWAcceleration then
-          "$out/bin/sea-greeter"
-        else
-          "export WEBKIT_DISABLE_DMABUF_RENDERER=1 && $out/bin/sea-greeter"
-      }"
+      --replace "Exec=sea-greeter" "Exec=$out/bin/sea-greeter"
 
     # the xserver.lightdm.greeter.package options expects the .desktop file to 
     # be on the root level. 
