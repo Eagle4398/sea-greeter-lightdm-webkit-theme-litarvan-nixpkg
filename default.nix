@@ -7,5 +7,6 @@ in
   pkgs.callPackage ./sea-greeter.nix {
         theme = litarvan-theme;
         backgrounds = nature-images;
+        enableHWAcceleration = false;
   }
 

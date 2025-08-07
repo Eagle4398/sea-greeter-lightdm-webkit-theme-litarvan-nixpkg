@@ -1,5 +1,18 @@
-{ lib, stdenv, fetchFromGitHub, meson, ninja, pkg-config, gtk3, webkitgtk
-, lightdm, glib, libyaml, typescript, fetchurl, theme ? null, backgrounds ? null
+{ lib
+, stdenv
+, fetchFromGitHub
+, meson
+, ninja
+, pkg-config
+, gtk3
+, webkitgtk
+, lightdm
+, glib
+, libyaml
+, typescript
+, theme ? null
+, backgrounds ? null
+, enableHWAcceleration ? false
 }:
 
 stdenv.mkDerivation rec {
@@ -62,9 +75,13 @@ stdenv.mkDerivation rec {
     mv $NESTED_DIR/* $out/
     rm -rf $out/nix
 
-    # patch desktop executable reference
     substituteInPlace $out/usr/share/xgreeters/sea-greeter.desktop \
-      --replace "Exec=sea-greeter" "Exec=$out/bin/sea-greeter"
+      --replace "Exec=sea-greeter" "Exec=${
+        if enableHWAcceleration then
+          "$out/bin/sea-greeter"
+        else
+          "export WEBKIT_DISABLE_DMABUF_RENDERER=1 && $out/bin/sea-greeter"
+      }"
 
     # the xserver.lightdm.greeter.package options expects the .desktop file to 
     # be on the root level. 
