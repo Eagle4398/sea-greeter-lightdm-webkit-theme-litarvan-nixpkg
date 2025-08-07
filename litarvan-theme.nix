@@ -5,10 +5,10 @@ buildNpmPackage rec {
   version = "unstable-2023-03-10";
 
   src = fetchFromGitHub {
-    owner = "Litarvan";
+    owner = "dragonfly1033";
     repo = "lightdm-webkit-theme-litarvan";
-    rev = "0062bb174d3931eade25c83e4e2947027c9a063a";
-    hash = "sha256-SK6OTWGKtz6rFyUU6KE6zIjdhF5AhKdIKDk32hPKFRs=";
+    rev = "e4e977239156f415a8e1c511317bcf73cfb4015f";
+    hash = "sha256-03ttvg+w2Ikh/FfX0fgeL/KTy+C2DRaBXMwfMB+cppw=";
   };
 
   npmDepsHash = "sha256-+gaS/8Dr35lMKqfH9NKlCgJTpaqA0AlWS3Cx5TNrWyk=";
@@ -22,9 +22,9 @@ buildNpmPackage rec {
 
   meta = with lib; {
     description = "Litarvan's LightDM HTML Theme";
-    homepage = "https://github.com/Litarvan/lightdm-webkit-theme-litarvan";
+    homepage = "https://github.com/dragonfly1033/lightdm-webkit-theme-litarvan";
     license = licenses.bsd3;
     platforms = platforms.linux;
-    maintainers = [ Litarvan ];
+    maintainers = [ Litarvan dragonfly1033 ];
   };
 }
