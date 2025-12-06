@@ -1,20 +1,6 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, meson
-, ninja
-, pkg-config
-, gtk3
-, webkitgtk
-, lightdm
-, glib
-, libyaml
-, typescript
-, makeWrapper
-, theme ? null
-, backgrounds ? null
-, enableHWAcceleration ? false
-}:
+{ lib, stdenv, fetchFromGitHub, meson, ninja, pkg-config, gtk3, webkitgtk_4_1
+, lightdm, glib, libyaml, typescript, makeWrapper, cmake, theme ? null
+, backgrounds ? null, enableHWAcceleration ? false }:
 
 stdenv.mkDerivation rec {
   pname = "sea-greeter";
@@ -28,9 +14,9 @@ stdenv.mkDerivation rec {
     fetchSubmodules = true;
   };
 
-  nativeBuildInputs = [ meson ninja pkg-config typescript makeWrapper];
+  nativeBuildInputs = [ meson ninja pkg-config typescript makeWrapper ];
 
-  buildInputs = [ gtk3 webkitgtk lightdm glib libyaml theme ];
+  buildInputs = [ gtk3 webkitgtk_4_1 lightdm glib libyaml theme cmake ];
 
   configurePhase = ''
     runHook preConfigure
@@ -77,7 +63,7 @@ stdenv.mkDerivation rec {
     rm -rf $out/nix
 
     ${lib.optionalString (enableHWAcceleration == false) ''
-        wrapProgram $out/bin/sea-greeter --set WEBKIT_DISABLE_DMABUF_RENDERER 1
+      wrapProgram $out/bin/sea-greeter --set WEBKIT_DISABLE_DMABUF_RENDERER 1
     ''}
 
     substituteInPlace $out/usr/share/xgreeters/sea-greeter.desktop \
@@ -99,6 +85,15 @@ stdenv.mkDerivation rec {
       ln -s "${backgrounds}"/* "$backgrounds_dir/"
       ls "$backgrounds_dir"
     ''}
+  '';
+
+  postPatch = ''
+    substituteInPlace src/meson.build \
+      --replace "webkit2gtk-4.0" "webkit2gtk-4.1"
+    substituteInPlace src/meson.build \
+      --replace "webkit2gtk-web-extension-4.0" "webkit2gtk-web-extension-4.1"
+
+    sed -i 's/libsoup-2.4/libsoup-3.0/g' src/meson.build
   '';
 
   meta = with lib; {
